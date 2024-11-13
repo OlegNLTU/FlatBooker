@@ -4,6 +4,7 @@ namespace FlatBooker.DAL.Entities
 {
     public class User : IdentityUser
     {
-        ICollection<Flat> Flats { get; set; } = new List<Flat>();
+        ICollection<Flat> Flats { get; set; } = [];
+        ICollection<BookedDate> BookedDates { get; set; } = [];
     }
 }

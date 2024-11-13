@@ -18,6 +18,8 @@ namespace FlatBooker.DAL.DbContext
         }
 
         public DbSet<Flat> Flats { get; set; } = null!;
+        public DbSet<BookedDate> BookedDates { get; set; } = null!;
+        public DbSet<Image> FlatImages { get; set; } = null!;
 
     }
 }

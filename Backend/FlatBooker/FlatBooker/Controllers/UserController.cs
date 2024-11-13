@@ -1,4 +1,6 @@
-﻿using FlatBooker.BLL.Services.Interfaces;
+﻿using FlatBooker.BLL.Models;
+using FlatBooker.BLL.Services;
+using FlatBooker.BLL.Services.Interfaces;
 using FlatBooker.DAL.Entities;
 using FlatBooker.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -57,7 +59,102 @@ namespace FlatBooker.Controllers
             return Ok("User deleted successfully");
         }
 
-        //TODO: delete any flat - admin
-        // add flat, delete only your flat, update flat, book flat - any user can do that
+
+        [HttpDelete("/delete-flat/{flatId}")]
+        [Authorize(Policy = "RequireAdminRole")]
+        public async Task<IActionResult> DeleteFlatAsync(string flatId)
+        {
+            var flat = await _flatService.GetFlatByIdAsync(flatId);
+            if (flat == null)
+                return NotFound("Flat not found");
+
+            var result = await _flatService.DeleteFlatAsync(flatId);
+            if (!result)
+                return BadRequest("Failed to delete flat");
+
+            return Ok("Flat deleted successfully");
+        }
+
+        [HttpPost("/add-flat")]
+        public async Task<IActionResult> AddFlatAsync([FromBody] FlatModel flatModel)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized("User not authenticated");
+
+            var result = await _flatService.AddFlatAsync(flatModel, user.Id);
+            if (!result)
+                return BadRequest("Failed to add flat");
+
+            return Ok("Flat added successfully");
+        }
+
+        [HttpPost("/add-my-flat")]
+        public async Task<IActionResult> AddMyFlatAsync([FromBody] FlatModel flatModel)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized("User not authenticated");
+
+            var result = await _flatService.AddFlatAsync(flatModel, user.Id);
+            if (!result)
+                return BadRequest("Failed to add flat");
+
+            return Ok("Flat added successfully");
+        }
+
+        [HttpDelete("/delete-my-flat/{flatId}")]
+        public async Task<IActionResult> DeleteMyFlatAsync(string flatId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized("User not authenticated");
+
+            var flat = await _flatService.GetFlatByIdAsync(flatId);
+            if (flat == null || flat.OwnerId != user.Id)
+                return BadRequest("You cannot delete this flat");
+
+            var result = await _flatService.DeleteFlatAsync(flatId);
+            if (!result)
+                return BadRequest("Failed to delete flat");
+
+            return Ok("Your flat has been deleted successfully");
+        }
+
+        [HttpPut("/update-my-flat/{flatId}")]
+        public async Task<IActionResult> UpdateMyFlatAsync(string flatId, [FromBody] FlatModel flatModel)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized("User not authenticated");
+
+            var flat = await _flatService.GetFlatByIdAsync(flatId);
+            if (flat == null || flat.OwnerId != user.Id)
+                return BadRequest("You cannot update this flat");
+
+            var result = await _flatService.UpdateFlatAsync(flatId, flatModel);
+            if (!result)
+                return BadRequest("Failed to update flat");
+
+            return Ok("Flat updated successfully");
+        }
+
+        [HttpPost("/book-flat/{flatId}")]
+        public async Task<IActionResult> BookFlatAsync(string flatId, [FromBody] BookingModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized("User not authenticated");
+
+            var flat = await _flatService.GetFlatByIdAsync(flatId);
+            if (flat == null)
+                return NotFound("Flat not found");
+
+            var result = await _flatService.BookFlatAsync(flatId, user.Id, model);
+            if (!result)
+                return BadRequest("Failed to book flat");
+
+            return Ok("Flat booked successfully");
+        }
     }
 }
