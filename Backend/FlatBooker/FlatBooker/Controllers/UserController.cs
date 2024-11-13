@@ -59,7 +59,6 @@ namespace FlatBooker.Controllers
             return Ok("User deleted successfully");
         }
 
-
         [HttpDelete("/delete-flat/{flatId}")]
         [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteFlatAsync(string flatId)
@@ -77,20 +76,6 @@ namespace FlatBooker.Controllers
 
         [HttpPost("/add-flat")]
         public async Task<IActionResult> AddFlatAsync([FromBody] FlatModel flatModel)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Unauthorized("User not authenticated");
-
-            var result = await _flatService.AddFlatAsync(flatModel, user.Id);
-            if (!result)
-                return BadRequest("Failed to add flat");
-
-            return Ok("Flat added successfully");
-        }
-
-        [HttpPost("/add-my-flat")]
-        public async Task<IActionResult> AddMyFlatAsync([FromBody] FlatModel flatModel)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
