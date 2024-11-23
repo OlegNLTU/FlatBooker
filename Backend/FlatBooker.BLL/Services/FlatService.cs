@@ -14,6 +14,51 @@ namespace FlatBooker.BLL.Services
             _context = context;
         }
 
+        public async Task<List<FlatModel>> GetFlats()
+        {
+            var flats = await _context.Flats
+                .Include(x => x.Images)
+                .Include(x => x.BookedDates)
+                .ToListAsync();
+            var flatModel = new List<FlatModel>();
+
+            foreach (var flat in flats)
+            {
+                flatModel.Add(new FlatModel
+                {
+                    Id = flat.Id,
+                    Address = flat.Address,
+                    CountOfRooms = flat.CountOfRooms,
+                    CountOfBuildingFloors = flat.CountOfBuildingFloors,
+                    Price = flat.Price,
+                    Square = flat.Square,
+                    Floor = flat.Floor,
+                    IndividualHeating = flat.IndividualHeating,
+                    Parking = flat.Parking,
+                    PetFriendly = flat.PetFriendly,
+                    ImageBase64 = flat.Images.Select(x => x.ImageBase64).ToList(),
+                    BookedDates = flat.BookedDates.Select(x => new BookingModel
+                    {
+                        Start = x.Start,
+                        End = x.End
+                    }).ToList(),
+                    UserId = flat.OwnerId
+                });
+            }
+            return flatModel;
+        }
+
+        public async Task<List<BookingModel>> GetBookedDates(string flatId)
+        {
+            var bookedDates = _context.BookedDates.Where(x => x.FlatId == flatId).Select(x => new BookingModel
+            {
+                Start = x.Start,
+                End = x.End
+            }).ToList();
+            return bookedDates;
+        }
+
+
         public async Task<bool> AddFlatAsync(FlatModel flatModel, string userId)
         {
             var flat = new Flat

@@ -60,7 +60,7 @@ namespace FlatBooker.Controllers
         }
 
         [HttpDelete("/delete-flat/{flatId}")]
-        [Authorize(Policy = "RequireAdminRole")]
+        //[Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteFlatAsync(string flatId)
         {
             var flat = await _flatService.GetFlatByIdAsync(flatId);
@@ -72,6 +72,13 @@ namespace FlatBooker.Controllers
                 return BadRequest("Failed to delete flat");
 
             return Ok("Flat deleted successfully");
+        }
+
+
+        [HttpGet("/flats")]
+        public async Task<IActionResult> GetFlats()
+        {
+            return Ok(await _flatService.GetFlats());
         }
 
         [HttpPost("/add-flat")]
@@ -86,24 +93,6 @@ namespace FlatBooker.Controllers
                 return BadRequest("Failed to add flat");
 
             return Ok("Flat added successfully");
-        }
-
-        [HttpDelete("/delete-my-flat/{flatId}")]
-        public async Task<IActionResult> DeleteMyFlatAsync(string flatId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Unauthorized("User not authenticated");
-
-            var flat = await _flatService.GetFlatByIdAsync(flatId);
-            if (flat == null || flat.OwnerId != user.Id)
-                return BadRequest("You cannot delete this flat");
-
-            var result = await _flatService.DeleteFlatAsync(flatId);
-            if (!result)
-                return BadRequest("Failed to delete flat");
-
-            return Ok("Your flat has been deleted successfully");
         }
 
         [HttpPut("/update-my-flat/{flatId}")]
@@ -140,6 +129,14 @@ namespace FlatBooker.Controllers
                 return BadRequest("Failed to book flat");
 
             return Ok("Flat booked successfully");
+        }
+
+        [HttpGet("/flats/{flatId}/booked-dates")]
+        public async Task<IActionResult> GetBookedDates(string flatId)
+        {
+            var bookedDates = await _flatService.GetBookedDates(flatId);
+            
+            return Ok(bookedDates);
         }
     }
 }

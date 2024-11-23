@@ -1,10 +1,12 @@
-﻿using FlatBooker.BLL.Services.Interfaces;
+﻿using FlatBooker.BLL.Services;
+using FlatBooker.BLL.Services.Interfaces;
 using FlatBooker.DAL.Entities;
 using FlatBooker.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FlatBooker.Controllers
 {
@@ -24,6 +26,21 @@ namespace FlatBooker.Controllers
             _roleManager = roleManager;
         }
 
+        [HttpGet("/user-claims")]
+        [Authorize]
+        public IActionResult GetClaims()
+        {
+            var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (id == null || role == null)
+            {
+                return Unauthorized("User claims are missing");
+            }
+
+            return Ok(new ClaimsModel { Id = id, Role = role });
+        }
+
         [HttpPost("/login")]
         public async Task<IActionResult> LoginAsync([FromBody] AuthenticationModel model)
         {
@@ -35,10 +52,9 @@ namespace FlatBooker.Controllers
             var tokenString = _jwtService.GetToken(user.Id, user.UserName, roles[0]);
 
             return Ok(new { token = tokenString });
-        }
+        } 
 
         [HttpPost("/register")]
-        [AllowAnonymous]
         public async Task<IActionResult> RegisterAsync([FromBody] AuthenticationModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);

@@ -10,6 +10,8 @@ namespace FlatBooker.BLL.Services.Interfaces
 {
     public interface IFlatService
     {
+        Task<List<FlatModel>> GetFlats();
+        Task<List<BookingModel>> GetBookedDates(string flatId);
         Task<bool> AddFlatAsync(FlatModel flatModel, string userId);
         Task<Flat?> GetFlatByIdAsync(string flatId);
         Task<bool> DeleteFlatAsync(string flatId);
