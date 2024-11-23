@@ -2,9 +2,8 @@ import React, { useState,useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Typography, Card, CardContent, TextField, ImageList, ImageListItem, CircularProgress, Badge } from '@mui/material';
 import { toast } from 'react-toastify';
-import { LocalizationProvider, DateRangePicker, PickersDay  } from '@mui/x-date-pickers-pro';
+import { LocalizationProvider, DateRangePicker  } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { isSameDay, isWithinInterval, isBefore } from 'date-fns';
 import axios from 'axios';
 
 export default function FlatInfo() {
@@ -54,7 +53,7 @@ export default function FlatInfo() {
           toast.success('Flat booked successfully!');
           fetchBookedDates();
       } catch (error) {
-          toast.error('Error booking flat: ' + error.message);
+        toast.error('Error occured, take a look maybe you booked date that is already booked');
       } finally {
           setLoading(false);
       }
@@ -66,40 +65,17 @@ export default function FlatInfo() {
       }
     }, [flat]);
 
-
-    const isDateBooked = (date) => {
-      console.log(bookedDates)
-      return bookedDates.some(({ startDate, endDate }) => {
-          const start = new Date(startDate);
-          const end = new Date(endDate);
-  
-          if (isNaN(start) || isNaN(end)) {
-              return false;
-          }
-  
-          return isWithinInterval(date, { start, end });
-      });
-    };
-    
-    const renderDayContent = (day, pickersDayProps) => {
-      const isBooked = isDateBooked(day);
-      const isPast = isBefore(day, new Date());
-      
+    const isDateBookedOrPast = (date) => {
       return (
-        <Badge
-          key={day.toString()}
-          overlap="circular"
-          badgeContent={isBooked ? '🌚' : undefined}>
-          <PickersDay
-            {...pickersDayProps}
-            sx={{
-              backgroundColor: isBooked ? '#f8d7da' : isPast ? '#e0e0e0' : undefined,
-              color: isBooked ? '#721c24' : isPast ? '#888' : undefined,
-              borderRadius: '50%',
-            }}
-            disabled={isPast || isBooked}
-          />
-        </Badge>
+        date < new Date() ||
+        bookedDates.some(
+          (range) =>{
+            console.log(range)
+            const start = new Date(range.start);
+            const end = new Date(range.end);
+            return date >= start && date <= end
+          } 
+        )
       );
     };
 
@@ -145,25 +121,13 @@ export default function FlatInfo() {
                         )}
                     </div>
 
-
-
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DateRangePicker
                             startText="Start Date"
                             endText="End Date"
                             value={bookingDetails}
                             onChange={(newValue) => setBookingDetails(newValue)}
-                            renderInput={(startProps, endProps) => (
-                                <>
-                                    <TextField {...startProps} fullWidth margin="normal" />
-                                    <TextField {...endProps} fullWidth margin="normal" />
-                                </>
-                            )}
-                            renderLoading={() => <CircularProgress />}  // Custom loading spinner
-                            slots={{
-                              day: renderDayContent,
-                            }}
-                            slotProps={""}/>
+                            shouldDisableDate={(date) => isDateBookedOrPast(date)}/>
                     </LocalizationProvider>
 
                     <Button

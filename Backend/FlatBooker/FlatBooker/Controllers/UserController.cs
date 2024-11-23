@@ -60,7 +60,6 @@ namespace FlatBooker.Controllers
         }
 
         [HttpDelete("/delete-flat/{flatId}")]
-        //[Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteFlatAsync(string flatId)
         {
             var flat = await _flatService.GetFlatByIdAsync(flatId);
