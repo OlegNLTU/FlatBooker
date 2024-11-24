@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FaBars, FaRegChartBar, FaTh, FaUserAlt } from "react-icons/fa";
+
+import { FaBars, FaHome, FaInfoCircle } from "react-icons/fa"; // Замінив іконки
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
@@ -9,13 +10,13 @@ const Sidebar = () => {
     const menuItem = [
         {
             path: "/grid",
-            name: "Grid",
-            icon: <FaRegChartBar />,
+            name: "Flats",
+            icon: <FaHome />
         },
         {
             path: "/about",
             name: "About",
-            icon: <FaUserAlt />,
+            icon: <FaInfoCircle />,
         },
     ];
 
