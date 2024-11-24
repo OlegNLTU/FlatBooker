@@ -19,6 +19,8 @@ const Signup = () => {
                 password: password
             });
 
+            console.log(response);
+
             if (response.status === 200) {
                 toast('Signup successful, u have to login now!');
                 console.log('Успішна реєстрація:', response.data);

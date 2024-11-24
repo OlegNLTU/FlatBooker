@@ -25,7 +25,7 @@ const Login = () => {
                 const token = response.data.token;
                 localStorage.setItem('token', token);
                 toast('Login was successful!');
-                navigate('/dashboard');
+                navigate('/grid');
             }
         }
         catch (error) {
