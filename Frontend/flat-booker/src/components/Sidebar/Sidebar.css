@@ -1,0 +1,65 @@
+/* Стилі для Sidebar */
+.sidebar {
+    background-color: #0f0909;
+    height: 100vh;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    color: #ffffff;
+    padding-top: 20px;
+    position: relative;
+}
+
+/* Стилі для логотипу */
+.logo {
+    font-size: 50px; /* Збільшений розмір логотипу */
+    font-weight: 900;
+    margin-left: 20px;
+    color: #ffffff; /* Білий */
+    font-family: 'Roboto', sans-serif; /* Сучасний шрифт */
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Стилі для іконки меню */
+.bars {
+    font-size: 35px; /* Збільшений розмір іконки гамбургер-меню */
+    color: #ffffff; /* Білий */
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 32px;
+}
+
+/* Стилі для посилань */
+.link {
+    display: flex;
+    align-items: center;
+    color: #ffffff; /* Білий */
+    text-decoration: none;
+    margin: 20px 10px;
+    border-radius: 8px;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.link:hover {
+    background-color: #444444; /* Трохи світліший сірий для ефекту */
+}
+
+.link .icon {
+    font-size: 30px; /* Збільшений розмір іконок в меню */
+    color: #ffffff; /* Білий для іконок */
+    margin-right: 10px;
+}
+
+.link_text {
+    color: #ffffff; /* Білий текст */
+}
+
+/* Активне посилання */
+.active {
+    background-color: #111111; /* Три рівні чорного для активного */
+    color: #ffffff; /* Білий текст */
+}

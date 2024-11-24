@@ -135,7 +135,18 @@ export default function FlatInfo() {
                         variant="contained"
                         color="primary"
                         disabled={loading}
-                        style={{ marginTop: '20px' }}>
+                        style={{
+                            marginTop: '20px',
+                            backgroundColor: '#000000',
+                            padding: '12px 24px', // Збільшено внутрішні відступи
+                            fontSize: '16px', // Збільшено розмір тексту
+                            width: '360px', // Збільшено ширину
+                            textAlign: 'center', // Центрування тексту всередині кнопки
+                            margin: '20px auto', // Центрування самої кнопки
+                            display: 'block', // Блочний елемент для автоматичного центрування
+                            borderRadius: '8px', // Додано округлення
+                            color: '#ffffff' // Білий текст для контрасту
+                        }}>
                         {loading ? <CircularProgress size={24} /> : 'Book Flat'}
                     </Button>
                 </CardContent>

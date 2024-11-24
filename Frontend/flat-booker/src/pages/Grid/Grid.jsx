@@ -18,14 +18,16 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const Grid = () =>{
+const Grid = () => {
     const [loading, setLoading] = useState(false);
     const [userInfo, setUserInfo] = useState({ id: null, role: null });
     const [flats, setFlats] = useState([]);
     const navigate = useNavigate();
     
-    const [openDialog, setOpenDialog] = useState(false); // State to control the dialog
+    const [openDialog, setOpenDialog] = useState(false);
     const [flatForm, setFlatForm] = useState({
+        id: '',
+        userId: '',
         address: '',
         countOfRooms: 1,
         countOfBuildingFloors: 1,
@@ -59,7 +61,7 @@ const Grid = () =>{
                 { headers: { Authorization: `Bearer ${token}`} }
             );
             setFlats(response.data);
-            console.log(flats)
+            console.log(flats);
         } catch (error) {
             console.error('Error fetching URL page:', error);
             toast.error('Error fetching flats: ' + error.message);
@@ -95,6 +97,7 @@ const Grid = () =>{
     const handleAddFlat = async () => {
         setLoading(true);
         try {
+            console.log(flatForm);
             const endpoint = `https://localhost:7136/add-flat`;
             const response = await axios.post(endpoint, flatForm, {
                 headers: {
@@ -103,12 +106,12 @@ const Grid = () =>{
                 },
             });
             toast.success(response.data);
-            fetchData(); // Refresh the flat list
-            setOpenDialog(false); // Close the dialog
+            fetchData();
         } catch (error) {
             toast.error(error.response?.data || 'Error adding flat');
         } finally {
             setLoading(false);
+            setOpenDialog(false);
         }
     };
 
@@ -164,22 +167,20 @@ const Grid = () =>{
             }
         };
         fetchUserInfo();
-    }, [])
+    }, []);
 
     useEffect(() => {
-
         fetchData();
     }, []);
 
-    
-    return(
+    return (
         <div
             style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                maxWidth: '800px',
+                maxWidth: '1200px',
                 margin: '0 auto',
                 padding: '20px',
             }}>
@@ -193,24 +194,49 @@ const Grid = () =>{
                 (
                     <>
                         {userInfo.id !== null && (
-                            <Button onClick={() => setOpenDialog(true)} variant="outlined">
+                            <Button onClick={() => setOpenDialog(true)} variant="outlined" 
+                                style={
+                                    { 
+                                        position: 'fixed', 
+                                        bottom: '20px',
+                                        zIndex: '10',
+                                        width: '250px',
+                                        fontSize: '20px',
+                                        borderRadius: '8px', 
+                                        backgroundColor: 'black',
+                                        color: 'white',
+                                        fontFamily: 'Roboto, sans-serif',
+                                    }
+                                }>
                                 Add Flat
                             </Button>
                         )}
 
-                        {flats.length > 0 
-                            ? 
-                            (
-                                flats.map((item, index) => {
-                                    console.log(item)
-
-                                    return (
-                                        <Card key={index} style={{ marginBottom: '20px', maxWidth: 345 }}>
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                justifyContent: 'space-between',
+                                gap: '20px',
+                                marginBottom: '60px',
+                            }}
+                        >
+                            {flats.length > 0 
+                                ? 
+                                (
+                                    flats.map((item, index) => {
+                                        return (
+                                            <Card key={index} style={{ width: '48%' }}>
                                             {item.imageBase64 && item.imageBase64.length > 0 && (
                                                 <img
                                                     src={`${item.imageBase64[0]}`}
                                                     alt="Flat Image"
-                                                    style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '500px',
+                                                        objectFit: 'cover',
+                                                        borderRadius: '8px',
+                                                    }}
                                                 />
                                             )}
                                             <CardContent>
@@ -223,7 +249,13 @@ const Grid = () =>{
                                                 <Button 
                                                     variant="contained" 
                                                     color="primary" 
-                                                    style={{ marginTop: '10px' }} 
+                                                    style={{
+                                                        marginTop: '10px',
+                                                        backgroundColor: 'black',
+                                                        color: 'white',
+                                                        padding: '8px 16px',
+                                                        fontSize: '14px',
+                                                    }} 
                                                     onClick={() => handleDetailedInfo(item)}>
                                                     Detailed Info
                                                 </Button>
@@ -231,21 +263,28 @@ const Grid = () =>{
                                                     <Button
                                                         variant="contained"
                                                         color="warning"
-                                                        style={{ marginTop: '10px', marginLeft: '10px' }}
+                                                        style={{
+                                                            marginTop: '10px',
+                                                            marginLeft: '10px',
+                                                            backgroundColor: '#f44336',
+                                                            padding: '8px 16px',
+                                                            fontSize: '14px',
+                                                        }}
                                                         onClick={() => handleDeleteFlat(item.id)}>
                                                         Delete Flat
                                                     </Button>
                                                 )}
                                             </CardContent>
-                                        </Card>
-                                    );
-                                })
-                            )
-                            : 
-                            (
-                                <p>No items to display.</p>
-                            )
-                        }
+                                        </Card>                                    
+                                        );
+                                    })
+                                )
+                                : 
+                                (
+                                    <p>List is empty : (</p>
+                                )
+                            }
+                        </div>
 
                         <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
                             <DialogTitle>Add New Flat</DialogTitle>
@@ -281,6 +320,22 @@ const Grid = () =>{
                                     margin="dense"
                                     value={flatForm.floor}
                                     onChange={handleFlatFormChange}/>
+                                <TextField
+                                    name="countOfRooms"
+                                    label="Number of Rooms"
+                                    type="number"
+                                    fullWidth
+                                    margin="dense"
+                                    value={flatForm.countOfRooms}
+                                    onChange={handleFlatFormChange}/>
+                                <TextField
+                                    name="countOfBuildingFloors"
+                                    label="Building Floors"
+                                    type="number"
+                                    fullWidth
+                                    margin="dense"
+                                    value={flatForm.countOfBuildingFloors}
+                                    onChange={handleFlatFormChange}/>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -289,7 +344,7 @@ const Grid = () =>{
                                             onChange={handleFlatFormChange}
                                         />
                                     }
-                                    label="Individual Heating"/>
+                                    label="Individual Heating" />
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -298,22 +353,26 @@ const Grid = () =>{
                                             onChange={handleFlatFormChange}
                                         />
                                     }
-                                    label="Parking"/>
+                                    label="Parking" />
                                 <FormControlLabel
                                     control={
                                         <Checkbox
-                                            name="pet-friendly"
+                                            name="petFriendly"
                                             checked={flatForm.petFriendly}
                                             onChange={handleFlatFormChange}
                                         />
                                     }
-                                    label="Pet friendly"/>
-                                <input type="file" multiple onChange={handleImageUpload} />
+                                    label="Pet Friendly" />
+                                <input
+                                    type="file"
+                                    name="imageBase64"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleImageUpload}
+                                    style={{ marginTop: '10px' }} />
                             </DialogContent>
                             <DialogActions>
-                                <Button onClick={() => setOpenDialog(false)} color="secondary">
-                                    Cancel
-                                </Button>
+                                <Button onClick={() => setOpenDialog(false)} color="primary">Cancel</Button>
                                 <Button onClick={handleAddFlat} color="primary" disabled={loading}>
                                     {loading ? 'Adding...' : 'Add'}
                                 </Button>
@@ -323,6 +382,7 @@ const Grid = () =>{
                 )
             }
         </div>
-    )
-}
+    );
+};
+
 export default Grid;
